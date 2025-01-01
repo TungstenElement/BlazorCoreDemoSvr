@@ -1,0 +1,100 @@
+﻿@page "/weather"
+@* @attribute [StreamRendering] *@
+@using OpenMeteo
+@inherits LayoutComponentBase
+@using BlazorCoreDemoSvr.Shared
+
+
+
+
+<PageTitle>Weather</PageTitle>
+
+<h1>Weather</h1>
+
+<p>Demo to propergate weather data from OpenMeteo API Service.</p>
+
+<p>Current Location: Bukit Panjang</p>
+
+@if (current == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Date</th>
+                <th>Rain Probability %</th>
+                <th>Wind Speed within 10m</th>
+                <th>Temperature</th>
+                <th>Temperature within 2m</th>
+            </tr>
+        </thead>
+        <tbody>
+
+            
+            @if(ErrorMsg!="")
+            {
+                <tr>
+                    <td>@ErrorMsg</td>
+                </tr>
+            }
+            else
+            {
+                
+                
+                    <tr>
+                        <td>@localTime.ToLocalTime()</td>
+                        <td>@current.Rain</td>
+                        <td>@current.Windspeed_10m</td>
+                        <td>@current.Temperature</td>
+                        <td>@current.Temperature_2m</td>
+                    </tr>
+                
+                
+            }    
+            
+        </tbody>
+    </table>
+}
+
+@code {
+    private OpenMeteo.WeatherForecast? forecast;
+    private OpenMeteo.OpenMeteoClient? client;
+    private OpenMeteo.WeatherForecastOptions? forecastOptions;
+    //private OpenMeteo.DailyOptions? dailyOptions;
+    private OpenMeteo.CurrentOptions? currentOptions;
+    private OpenMeteo.Current? current;
+    private string ErrorMsg = "";
+    private DateTime localTime;
+
+    protected override async Task OnInitializedAsync()
+    {
+
+        // Simulate asynchronous loading to demonstrate streaming rendering
+        client = new OpenMeteoClient();
+        forecastOptions = new WeatherForecastOptions(1.3797f, 103.7647f); //Bukit Panjang Town
+
+
+        currentOptions = new CurrentOptions();
+        currentOptions.Add(CurrentOptionsParameter.rain);
+        currentOptions.Add(CurrentOptionsParameter.temperature_2m);
+        currentOptions.Add(CurrentOptionsParameter.windspeed_10m);
+        currentOptions.Add(CurrentOptionsParameter.surface_pressure);
+        forecastOptions.Current = currentOptions;
+
+        forecast = await client.QueryAsync(forecastOptions);
+        try
+        {
+            current = forecast.Current;
+            localTime = DateTime.Parse(current.Time);
+        }
+        catch (NullReferenceException nre)
+        {
+            ErrorMsg = nre.Message;
+        }
+    }
+
+}
