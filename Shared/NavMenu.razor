@@ -1,54 +1,43 @@
-﻿@inject NavigationManager NavigationManager
+﻿
 
-<header class="navbar navbar-expand-sm align-items-sm-stretch" >
-    <nav class="container-xxl bd-gutter flex-xxl-nowrap flex-xxl-nowrap" aria-label="Main Navigation">
-        <a class="navbar-brand text-danger" href="">Blazor & .NET Core Demo</a>
-        <button class="navbar-toggler m-lg-auto bg-secondary" type="button" data-toggle="collapse" data-target="#navbarText" aria-controls="navbarText" aria-expanded="false" aria-label="Toggle navigation">
+<nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom mb-5">
+    <div class="container-xxl p-3 gap-sm-5">
+        <img id="Brand" src="creative.png" width="100" height="100" href="" /><a class="navbar-brand" href="">Blazor Demo</a>
+        <button class="navbar-toggler bg-light" type="button" @onclick="ToggleNavMenu">
             <span class="navbar-toggler-icon"></span>
         </button>
-
-        <div class="collapse navbar-collapse" id="navbarText" onclick="document.querySelector('.navbar-toggler').click()">
-            <ul class="navbar-nav m-lg-auto mt-1 mt-md-auto" >
-                <li class="dropdown-header px-1">
-                    <a class="nav-link" href="#" >Home</a>   
-                    <ul class="dropdown-menu" >
-                        <li class="dropdown-item">Inner Home</li>
-                        <li class="dropdown-item">Outer Home</li>
-                        <li class="dropdown-divider"></li>
-                        <li class="dropdown-item">Final Home</li>
-                    </ul>
+        <div class="@NavMenuCssClass" @onclick="ToggleNavMenu">
+            <ul class="navbar-nav flex-grow-1">
+                <li></li>
+                <li class="nav-item">
+                    <NavLink class="nav-link text-dark" href="" Match="NavLinkMatch.All">
+                        <span class="oi oi-home" aria-hidden="true"></span> Home
+                    </NavLink>
                 </li>
-
-                <li class="dropdown-header px-1">
-                    <a class="nav-link" href="counter">Counter</a>
+                <li class="nav-item">
+                    <NavLink class="nav-link text-dark" href="counter">
+                        <span class="oi oi-plus" aria-hidden="true"></span> Counter
+                    </NavLink>
                 </li>
-
-                <li class="dropdown-header px-1">
-                    <a class="nav-link" href="weather">Weather</a>
+                <li class="nav-item">
+                    <NavLink class="nav-link text-dark" href="weather">
+                        <span class="oi oi-list-rich" aria-hidden="true"></span> Fetch Weather Data
+                    </NavLink>
                 </li>
- 
             </ul>
         </div>
-    </nav>
-</header>
+    </div>
+</nav>
 
 @code {
-    private string? currentUrl;
+    bool collapseNavMenu = true;
 
-    protected override void OnInitialized()
-    {
-        currentUrl = NavigationManager.ToBaseRelativePath(NavigationManager.Uri);
-        NavigationManager.LocationChanged += OnLocationChanged;
-    }
+    string baseMenuClass = "navbar-collapse d-sm-inline-flex flex-sm-row-reverse";
 
-    private void OnLocationChanged(object? sender, LocationChangedEventArgs e)
-    {
-        currentUrl = NavigationManager.ToBaseRelativePath(e.Location);
-        StateHasChanged();
-    }
+    string NavMenuCssClass => baseMenuClass + (collapseNavMenu ? " collapse" : "");
 
-    public void Dispose()
+    void ToggleNavMenu()
     {
-        NavigationManager.LocationChanged -= OnLocationChanged;
+        collapseNavMenu = !collapseNavMenu;
     }
 }
